@@ -27,11 +27,11 @@ public class PostController {
     public ResponseEntity<?> getPosts(@RequestParam(required = false) String keyword) {
         System.out.println("이 요청을 처리하는 PostController : " + System.identityHashCode(this));
         if(keyword != null) {
-            List<Map<String, Object>> posts = postService.searchPosts(keyword);
+            List<Post> posts = postService.searchPosts(keyword);
             return ResponseEntity.ok(posts);
         }
 
-        List<Map<String, Object>> posts = postService.getAllPosts();
+        List<Post> posts = postService.getAllPosts();
         return ResponseEntity.ok(posts);
     }
 
@@ -47,7 +47,7 @@ public class PostController {
         if (id <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("게시글 번호는 1 이상이여야 합니다.");
         }
-        Map<String, Object> post = postService.getPost(id);
+        Post post = postService.getPost(id);
         if(post == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("존재하지 않는 게시물입니다");
         }
@@ -61,7 +61,7 @@ public class PostController {
         String title =  (String)request.get("title");
         String content = (String) request.get("content");
 
-        Map<String, Object> response = postService.createPost(title, content);
+        Post response = postService.createPost(title, content);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
 //        return "[" + title + "] 게시글이 등록되었습니다. : " + content;
@@ -82,7 +82,7 @@ public class PostController {
         String content = (String)request.get("content");
 
 //        db에다가 id로 조회해서 title, content 내용을 수정한다고 치고~
-        Map<String, Object> response = postService.updatePost(id, title, content);
+        Post response = postService.updatePost(id, title, content);
         if(response == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("존재하지 않는 게시물입니다");
         }
