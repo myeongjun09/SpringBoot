@@ -4,6 +4,7 @@ import com.mirim.board.dto.PostRequest;
 import com.mirim.board.dto.PostResponse;
 import com.mirim.board.service.PostService;
 import com.sun.net.httpserver.HttpServer;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,16 +51,13 @@ public class PostController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("게시글 번호는 1 이상이여야 합니다.");
         }
         PostResponse post = postService.getPost(id);
-        if(post == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("존재하지 않는 게시물입니다");
-        }
         return ResponseEntity.ok(post);
 //        return ResponseEntity.status(HttpStatus.OK).body(id + "번 게시글입니다.");
 //        return id + "번 게시글입니다.";
     }
 
     @PostMapping // RequestMapping에서 posts를 붙였기에 여기서 안 써도 됨
-    public ResponseEntity<?> createPost(@RequestBody PostRequest request) {
+    public ResponseEntity<?> createPost(@Valid @RequestBody PostRequest request) {
         String title =  request.getTitle();
         String content = request.getContent();
 
@@ -70,7 +68,7 @@ public class PostController {
     } // 브라우저에서 요청하는 것은 GET 밖에 안됨
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updatePost(@PathVariable Long id, @RequestBody PostRequest request) {
+    public ResponseEntity<?> updatePost(@Valid @PathVariable Long id, @RequestBody PostRequest request) {
         // 게시글 번호가 0보다 작거나 같으면 잘못된 입력임
         if (id <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("게시글 번호는 1 이상이어야 합니다.");
