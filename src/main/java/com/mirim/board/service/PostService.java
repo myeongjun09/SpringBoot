@@ -1,9 +1,11 @@
 package com.mirim.board.service;
 
+import com.mirim.board.Member;
 import com.mirim.board.Notifier;
 import com.mirim.board.Post;
 import com.mirim.board.dto.PostResponse;
 import com.mirim.board.exception.ApiException;
+import com.mirim.board.repository.MemberRepository;
 import com.mirim.board.repository.PostRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,11 +21,13 @@ import java.util.Map;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final MemberRepository memberRepository;
     private final Notifier notifier;
     private final JdbcTemplate jdbcTemplate;
 
-    public PostService(PostRepository postRepository, Notifier notifier, JdbcTemplate jdbcTemplate) {
+    public PostService(PostRepository postRepository, MemberRepository memberRepository, Notifier notifier, JdbcTemplate jdbcTemplate) {
         this.postRepository = postRepository;
+        this.memberRepository = memberRepository;
         this.notifier = notifier;
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -36,8 +40,12 @@ public class PostService {
         return PostResponse.from(post);
     }
 
-    public PostResponse createPost(String title, String content) {
-        Post post = new Post(title, content);
+    public PostResponse createPost(String title, String content, Long loginMemberId) {
+        Member author = memberRepository.findById(loginMemberId).orElse(null);
+        if(author == null) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다.");
+        }
+        Post post = new Post(title, content, author);
         postRepository.save(post);
 
         //이메일 등록

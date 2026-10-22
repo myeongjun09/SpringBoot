@@ -1,6 +1,7 @@
 package com.mirim.board;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Comment;
 
 import java.time.LocalDateTime;
 
@@ -11,6 +12,11 @@ public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", nullable = false)
+    private Member author;
+
     @Column(nullable = false, length = 200) // 컬럼 어노테이션에는 이름을 따로 지정해주거나 notnull updatable를 줘서 쓸 수 있다.
     private String title;
     private String content;
@@ -25,9 +31,12 @@ public class Post {
 //    ORM으로 채워넣기 전에 객체를 빈 상태로 만들어 준다
 //    JPA를 사용하기 위해선 기본 생성자가 무조건 필요함
 
-    public Post(String title, String content) {
+    public Post(String title, String content, Member author) {
         this.title = title;
         this.content = content;
+        this.author = author;
+        this.createdAt = LocalDateTime.now();
+        this.viewCount = 0L;
     }
 
     public Long getId() {
@@ -56,5 +65,9 @@ public class Post {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public Member getAuthor() {
+        return author;
     }
 }

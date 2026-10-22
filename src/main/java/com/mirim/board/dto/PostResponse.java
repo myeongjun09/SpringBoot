@@ -8,12 +8,14 @@ public class PostResponse {
 
     private final Long id;
     private final String title;
+    private final AuthorResponse author;
     private final String content;
     private final LocalDateTime createAt;
 
-    private PostResponse(Long id, String title, String content, LocalDateTime createAt) {
+    private PostResponse(Long id, String title, String content, AuthorResponse author, LocalDateTime createAt) {
         this.id = id;
         this.title = title;
+        this.author = author;
         this.content = content;
         this.createAt = createAt;
     }
@@ -23,6 +25,7 @@ public class PostResponse {
                 post.getId(),
                 post.getTitle(),
                 post.getContent(),
+                AuthorResponse.from(post.getAuthor()),
                 post.getCreatedAt()
         );
     }
@@ -41,5 +44,9 @@ public class PostResponse {
 
     public LocalDateTime getCreateAt() {
         return createAt;
+    }
+
+    public AuthorResponse getAuthor() {
+        return author;
     }
 }
