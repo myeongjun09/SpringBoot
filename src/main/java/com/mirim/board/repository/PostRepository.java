@@ -3,6 +3,7 @@ package com.mirim.board.repository;
 
 import com.mirim.board.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -16,4 +17,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
 //    List<Post> findByTitleContentContaining(String keyword);
     // 미리 쿼리를 만들어 두기 때문에 오타가 나게 된다면 서버가 올라가지 않음
+
+    @Query("select p from Post p join fetch p.author")
+    List<Post> findAllWithAuthor();
 }

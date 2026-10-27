@@ -24,7 +24,7 @@ public class MemberService {
 
     public MemberResponse signup(SignupRequest request) {
         if(memberRepository.existsByLoginId(request.getLoginId())) {
-            throw new ApiException(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다.");
+            throw new ApiException(HttpStatus.CONFLICT, "이미 사용중인 아이디입니다.");
         }
         String password = request.getPassword(); // 평문 비밀번호
         String encodedPassword = passwordEncoder.encode(password); // 암호화된 패스워드

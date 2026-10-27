@@ -1,21 +1,15 @@
-package com.mirim.board;
+package com.mirim.board.controller;
 
 import com.mirim.board.dto.PostRequest;
 import com.mirim.board.dto.PostResponse;
 import com.mirim.board.login.SessionConst;
 import com.mirim.board.service.PostService;
-import com.sun.net.httpserver.HttpServer;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/posts")
@@ -91,23 +85,12 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    // PostController
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletePost(@PathVariable Long id) {
-        // 게시글 번호가 0보다 작거나 같으면 잘못된 입력임
-        if (id <= 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("게시글 번호는 1 이상이어야 합니다.");
-        }
-        if(id > 10) {
-            // 404
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("존재하지 않는 게시글입니다");
-        }
-
-        // db에서 삭제한다고 치고
-        boolean deleted = postService.deletePost(id);
-        if(!deleted) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("존재하지 않는 게시글입니다");
-        }
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    public ResponseEntity<Void> deletePost(@PathVariable Long id,
+                                           @SessionAttribute(name = SessionConst.LOGIN_MEMBER_ID) Long loginMemberId) {
+        postService.deletePost(id, loginMemberId);
+        return ResponseEntity.noContent().build();
     }
 
 //    public class Main {
