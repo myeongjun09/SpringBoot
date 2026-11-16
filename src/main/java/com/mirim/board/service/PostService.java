@@ -5,12 +5,14 @@ import com.mirim.board.Notifier;
 import com.mirim.board.Post;
 import com.mirim.board.dto.PostResponse;
 import com.mirim.board.exception.ApiException;
+import com.mirim.board.repository.CommentRepository;
 import com.mirim.board.repository.MemberRepository;
 import com.mirim.board.repository.PostRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,12 +25,14 @@ public class PostService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final Notifier notifier;
+    private final CommentRepository commentRepository;
     private final JdbcTemplate jdbcTemplate;
 
-    public PostService(PostRepository postRepository, MemberRepository memberRepository, Notifier notifier, JdbcTemplate jdbcTemplate) {
+    public PostService(PostRepository postRepository, MemberRepository memberRepository, Notifier notifier, JdbcTemplate jdbcTemplate, CommentRepository commentRepository) {
         this.postRepository = postRepository;
         this.memberRepository = memberRepository;
         this.notifier = notifier;
+        this.commentRepository = commentRepository;
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -68,6 +72,7 @@ public class PostService {
     }
 
     // PostService
+    @Transactional
     public void deletePost(Long id, Long loginMemberId) {
         Post post = postRepository.findById(id).orElse(null);
         if (post == null) {
@@ -76,6 +81,8 @@ public class PostService {
         if (!post.getAuthor().getId().equals(loginMemberId)) {
             throw new ApiException(HttpStatus.FORBIDDEN, "본인이 작성한 게시글만 삭제할 수 있습니다.");
         }
+        // todo : 댓글 삭제
+        commentRepository.deleteAll(commentRepository.findByPostId(id));
         postRepository.delete(post);
     }
 
